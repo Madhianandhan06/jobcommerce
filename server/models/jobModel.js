@@ -1,15 +1,17 @@
 import mongoose from 'mongoose';
 
-const jobSchema = mongoose.Schema({
-        title: {
-            type: String,
-            required: [true, 'Please add a title'],
-        },
-        location: {
-            type: String,
-            required: [true, 'Please add a location'],
-        }
-})
+const jobSchema = new mongoose.Schema({
+    description: {
+        type: String,
+        required: [true, 'Please add a description'],
+    },
+    location: {
+        type: String,
+        required: [true, 'Please add a location'],
+    }
+}, {
+    timestamps: true,
+});
 
-const Job = mongoose.models ||  mongoose.model('Job', jobSchema);
+const Job = mongoose.models.Job || mongoose.model('Job', jobSchema);
 export default Job;

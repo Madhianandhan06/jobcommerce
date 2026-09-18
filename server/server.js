@@ -11,7 +11,7 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use('api/auth', authRouter)
+app.use('/api/auth', authRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
