@@ -1,13 +1,27 @@
+import Home from "./pages/Home"
+import Contact from "./pages/Contact"
+import SearchJobs from "./pages/SearchJobs"
+import PostJobs from "./pages/PostJobs"
+import Earnings from "./pages/Earnings"
+import RootLayout from "./layouts/RootLayout"
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom"
+
 function App() {
+    const router = createBrowserRouter(
+        createRoutesFromElements(
+            <Route path="/" element={<RootLayout />}>
+                <Route index element={<Home />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="search-jobs" element={<SearchJobs />} />
+                <Route path="post-jobs" element={<PostJobs />} />
+                <Route path="earnings" element={<Earnings />} />
+            </Route>
+        )
+    )
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-100 text-slate-900">
-      <div className="rounded-2xl bg-white p-10 shadow-lg ring-1 ring-slate-200">
-        <h1 className="text-4xl font-bold tracking-tight">JobCommerce</h1>
-        <p className="mt-3 text-lg text-slate-600">
-          Tailwind is now set up and working in the client app.
-        </p>
-      </div>
-    </main>
+    <div className="bg-slate-600">
+        <RouterProvider router={router} />
+    </div>  
   )
 }
 
