@@ -5,11 +5,12 @@ const Navbar = () => {
     <div className='flex justify-between gap-4 p-4'>
       <div>logo</div>
         <ul className='flex gap-4'>
-            <NavLink to='/'>Home</NavLink>
-            <NavLink to='/contact'>Contact</NavLink>
-            <NavLink to='/post-jobs'>Post Jobs</NavLink>
-            <NavLink to='/search-jobs'>Search Jobs</NavLink>
-            <NavLink to='/earnings'>Earnings</NavLink>
+          {/* These pages are nested under /home, which is protected by ProtectedRoute. */}
+          <NavLink to='/home'>Home</NavLink>
+          <NavLink to='/home/contact'>Contact</NavLink>
+          <NavLink to='/home/post-jobs'>Post Jobs</NavLink>
+          <NavLink to='/home/search-jobs'>Search Jobs</NavLink>
+          <NavLink to='/home/earnings'>Earnings</NavLink>
         </ul>
     </div>
   )

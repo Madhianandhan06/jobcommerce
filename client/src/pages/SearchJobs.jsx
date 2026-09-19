@@ -7,15 +7,14 @@ const SearchJobs = () => {
   const [jobs, setJobs] = useState([])
 
   useEffect(() => {
-    async function searchJobs(params) {
-      const res = await fetch(`http://localhost:3000/api/auth/search-jobs`,{
-        method: 'GET'
+    async function searchJobs() {
+      const res = await fetch(`http://localhost:3000/api/auth/search-jobs`, {
+        method: 'GET',
+        credentials: 'include'
       })
 
       const data = await res.json()
-      // console.log(data);
-      setJobs(data.jobs)
-      console.log(data);
+      setJobs(data.jobs || [])
     }
     searchJobs()
   },[])
@@ -53,7 +52,7 @@ const formatRelativeTime = (dateString) => {
 
   return (
     <div>
-      {jobs.length === 0 ? (<p>No jobs has been listed</p>) 
+      {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>) 
         : (jobs.map((job) => (
           <div key={job._id} className='bg-orange-600 my-2 p-2 rounded-lg'>
             <h2>{job.description}</h2>

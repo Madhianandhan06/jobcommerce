@@ -8,7 +8,12 @@ const jobSchema = new mongoose.Schema({
     location: {
         type: String,
         required: [true, 'Please add a location'],
-    }
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
 }, {
     timestamps: true,
 });

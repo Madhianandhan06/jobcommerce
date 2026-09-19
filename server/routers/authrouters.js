@@ -1,9 +1,13 @@
 import express from 'express'
-import { jobsCreate, searchJobs } from '../controllers/authcontrollers.js'
+import { getCurrentUser, jobsCreate, login, myJobs, protect, register, searchJobs } from '../controllers/authcontrollers.js'
 
 const authRouter = express.Router()
 
-authRouter.post('/post-jobs', jobsCreate) 
+authRouter.post('/register', register) 
+authRouter.post('/login', login) 
+authRouter.get('/me', getCurrentUser)
+authRouter.post('/post-jobs', protect, jobsCreate) 
 authRouter.get('/search-jobs', searchJobs)
+authRouter.get('/my-jobs', protect, myJobs)
 
 export default authRouter
