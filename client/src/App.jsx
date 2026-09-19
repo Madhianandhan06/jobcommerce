@@ -4,18 +4,50 @@ import SearchJobs from "./pages/SearchJobs"
 import PostJobs from "./pages/PostJobs"
 import Earnings from "./pages/Earnings"
 import RootLayout from "./layouts/RootLayout"
-import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom"
+import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom"
+import Authpage from "./pages/Authpage"
+import { useEffect, useState } from "react"
+
+// Keep the application pages private until the user has authenticated.
+const ProtectedRoute = ({ children }) => {
+    const [authState, setAuthState] = useState('checking')
+
+    useEffect(() => {
+        // The browser sends the httpOnly cookie automatically with this request.
+        fetch('http://localhost:3000/api/auth/me', {
+            credentials: 'include',
+        })
+            .then((response) => {
+                setAuthState(response.ok ? 'authenticated' : 'unauthenticated')
+            })
+            .catch(() => {
+                setAuthState('unauthenticated')
+            })
+    }, [])
+
+    // Wait for the server response so a valid cookie is not redirected too early.
+    if (authState === 'checking') {
+        return <p>Checking authentication...</p>
+    }
+
+    return authState === 'authenticated'
+        ? children
+        : <Navigate to="/" replace />
+}
 
 function App() {
     const router = createBrowserRouter(
         createRoutesFromElements(
-            <Route path="/" element={<RootLayout />}>
-                <Route index element={<Home />} />
-                <Route path="contact" element={<Contact />} />
-                <Route path="search-jobs" element={<SearchJobs />} />
-                <Route path="post-jobs" element={<PostJobs />} />
-                <Route path="earnings" element={<Earnings />} />
-            </Route>
+            <>
+                <Route path="/" element={<Authpage />} />
+                    <Route path="/home" element={<ProtectedRoute> <RootLayout /> </ProtectedRoute>}>
+                    <Route index element={<Home />} />
+                    <Route path="search-jobs" element={<SearchJobs />} />
+                    <Route path="post-jobs" element={<PostJobs />} />
+                    <Route path="contact" element={<Contact />} />
+                    <Route path="earnings" element={<Earnings />} />
+                </Route>
+            </>
         )
     )
   return (

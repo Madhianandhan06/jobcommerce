@@ -4,7 +4,8 @@ const PostJobs = () => {
 
   const [open, setOpen] = useState(false)
   const [description, setRequirements] = useState('')
-  const [location] = useState('anna nagar, wall street, chennai')
+  const [location, setLocation] = useState('anna nagar, wall street, chennai')
+  const [myJobs, setMyJobs] = useState([])
 
   const [toast, setToast] = useState(null)
 
@@ -17,47 +18,55 @@ const PostJobs = () => {
 
     return () => clearTimeout(timer)
   }, [toast])
-  // console.log(typeof(location));
-  
-  function getLocation (){
-      if(!navigator.geolocation){
-        alert('Geolocation is not supported')
-        return
-      }
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const coords ={
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
+  useEffect(() => {
+    async function fetchMyJobs() {
+      try {
+        const res = await fetch('http://localhost:3000/api/auth/my-jobs', {
+          method: 'GET',
+          credentials: 'include'
+        })
 
-          setLocation(coords)
-        },
-        (error) => {
-          alert('Location permission denied')
-          console.log(error); 
+        const data = await res.json()
+        if (res.ok) {
+          setMyJobs(data.jobs || [])
         }
-      );
-  }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    fetchMyJobs()
+  }, [])
 
   async function createJobPost(){
-    console.log(description);
-    console.log(location);
-
     try {
       const res = await fetch(`http://localhost:3000/api/auth/post-jobs`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({description, location})
+        credentials: 'include',
+        body: JSON.stringify({ description, location })
       })
 
-      if(!res.ok){
-        throw new Error(`Something went wrong`)
-      }
       const data = await res.json()
-      console.log(data.message);
+
+      if(!res.ok){
+        throw new Error(data.message || 'Something went wrong')
+      }
+
       setToast(data.message)
+      setRequirements('')
+      setLocation('anna nagar, wall street, chennai')
+
+      const myJobsResponse = await fetch('http://localhost:3000/api/auth/my-jobs', {
+        method: 'GET',
+        credentials: 'include'
+      })
+
+      const myJobsData = await myJobsResponse.json()
+      if (myJobsResponse.ok) {
+        setMyJobs(myJobsData.jobs || [])
+      }
   
     } catch (error) {
       setToast(error.message)
@@ -78,15 +87,7 @@ const PostJobs = () => {
 
             <div  className='flex flex-col'>
               <label htmlFor="">location*</label>
-              <input className='p-1.5 rounded-lg' type="text" />
-            </div>
-
-            <p>{location?.lat}</p>
-            <p>{location?.lng}</p>
-
-
-            <div className='flex '>
-              <button onClick={getLocation} className='bg-green-600 flex-1 rounded-lg'>Current location</button>
+              <input className='p-1.5 rounded-lg' type="text" value={location} onChange={(e) => setLocation(e.target.value)} />
             </div>
 
             <div className='flex gap-2 my-2'>
@@ -95,6 +96,20 @@ const PostJobs = () => {
             </div>
           </div>
         )}
+
+        <div className='w-full mt-6'>
+          <h3 className='font-bold mb-2'>Your jobs</h3>
+          {!myJobs || myJobs.length === 0 ? (
+            <p>No jobs posted yet.</p>
+          ) : (
+            myJobs.map((job) => (
+              <div key={job._id} className='bg-orange-600 my-2 p-2 rounded-lg'>
+                <h2>{job.description}</h2>
+                <p className='text-xs'>{job.location}</p>
+              </div>
+            ))
+          )}
+        </div>
     </div>
   )
 }
