@@ -16,6 +16,7 @@ const ProtectedRoute = ({ children }) => {
         // The browser sends the httpOnly cookie automatically with this request.
         fetch('http://localhost:3000/api/auth/me', {
             credentials: 'include',
+            cache: 'no-store',
         })
             .then((response) => {
                 setAuthState(response.ok ? 'authenticated' : 'unauthenticated')

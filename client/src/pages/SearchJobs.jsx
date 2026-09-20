@@ -5,20 +5,31 @@ import { useEffect } from 'react'
 const SearchJobs = () => {
 
   const [jobs, setJobs] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function searchJobs() {
-      const res = await fetch(`http://localhost:3000/api/auth/search-jobs`, {
-        method: 'GET',
-        credentials: 'include'
-      })
+      try {
+        const res = await fetch(`http://localhost:3000/api/auth/search-jobs`, {
+          method: 'GET',
+          credentials: 'include'
+        })
 
-      const data = await res.json()
-      setJobs(data.jobs || [])
+        const data = await res.json()
+        setJobs(data.jobs || [])
+        setLoading(false)
+        } catch (error) {
+          setLoading(false)
+        } finally{
+          setLoading(false)
+        }
     }
     searchJobs()
   },[])
 
+  if(loading){
+    return <p>Loading Jobs</p>
+  }
 const formatRelativeTime = (dateString) => {
   const createdDate = new Date(dateString);
   const now = new Date();

@@ -1,14 +1,37 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const Authpage = () => {
     const navigate = useNavigate()
     const [isRegister, setIsRegister] = useState(false)
     const [error, setError] = useState(null)
+    const [checkingAuth, setCheckingAuth] = useState(true)
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+
+    useEffect(() => {
+        // The browser sends the httpOnly cookie automatically with this request.
+        fetch('http://localhost:3000/api/auth/me', {
+            credentials: 'include',
+            cache: 'no-store',
+        }).then((res) => {
+            if(res.ok){
+                navigate('/home', { replace: true })
+                return
+            }
+            // A failed auth check means the login form should be shown.
+            setCheckingAuth(false)
+        }).catch(() => {
+            // A failed request also means the login form should be shown.
+            setCheckingAuth(false)
+        })
+    }, [navigate])
+
+    if (checkingAuth) {
+        return <p>Checking authentication...</p>
+    }
 
     async function submitAuth(event) {
         event.preventDefault()
