@@ -93,6 +93,7 @@ export const myJobs = async (req, res) => {
 export const getCurrentUser = async (req, res) => {
     try {
         // Read the token from the httpOnly cookie and verify its user ID.
+        res.set('Cache-Control', 'no-store')
         const token = req.cookies.token
         if (!token) {
             return res.status(401).json({ message: 'No authentication cookie' })
