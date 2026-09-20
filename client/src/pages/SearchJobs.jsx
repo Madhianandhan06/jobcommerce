@@ -2,11 +2,38 @@ import React from 'react'
 import { useState } from 'react'
 import { useEffect } from 'react'
 
+
+function SearchBar({ value, onChange }){
+  console.log(value);
+  
+  return(
+    <div className='flex gap-2 p-2 justify-center items-center'>
+      <label htmlFor="">Search your Jobs</label>
+      <input className='px-2 py-1.5  shadow-lg rounded-lg ' type="text" placeholder='search by job...' value={value} onChange={onChange}/>
+    </div>
+  )
+}
+
+function FilteredJobs({ filteredJobs, formatRelativeTime }){
+  return(
+    <div>
+          {filteredJobs.map(job => (
+            <div key={job._id} className='bg-red-600 text-white my-2 p-2 rounded-lg'>
+              <h2>{job.description}</h2>
+              <p className='text-xs'>{job.location}</p>
+              <p>{formatRelativeTime(job.createdAt)}</p>
+            </div>
+          ))}
+    </div>
+  )
+}
+
+
 const SearchJobs = () => {
 
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
-
+  const [search, setSearch] = useState('')
   useEffect(() => {
     async function searchJobs() {
       try {
@@ -59,19 +86,20 @@ const formatRelativeTime = (dateString) => {
   }
 };
 
-
+const filteredJobs = jobs.filter(job => (
+  job.description.toLowerCase().includes(search.toLowerCase())
+))
 
   return (
     <div>
-      {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>) 
-        : (jobs.map((job) => (
-          <div key={job._id} className='bg-orange-600 my-2 p-2 rounded-lg'>
-            <h2>{job.description}</h2>
-            <p className='text-xs'>{job.location}</p>
-            <p>{formatRelativeTime(job.createdAt)}</p>
-          </div>
-        ))
-      )}
+          <div>
+            {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>) 
+              : <div>
+                <SearchBar value={search} onChange={(e) => setSearch(e.target.value)}/>
+                <FilteredJobs filteredJobs={filteredJobs} formatRelativeTime={formatRelativeTime}/>
+              </div>
+            }
+        </div>
     </div>
   )
 }
