@@ -5,8 +5,6 @@ import API_URL from '../config/api'
 
 
 function SearchBar({ value, onChange }){
-  console.log(value);
-  
   return(
     <div className='flex gap-2 p-2 justify-center items-center'>
       <label htmlFor="">Search your Jobs</label>
@@ -45,12 +43,11 @@ const SearchJobs = () => {
 
         const data = await res.json()
         setJobs(data.jobs || [])
+      } catch (error) {
+        setJobs([])
+      } finally{
         setLoading(false)
-        } catch (error) {
-          setLoading(false)
-        } finally{
-          setLoading(false)
-        }
+      }
     }
     searchJobs()
   },[])

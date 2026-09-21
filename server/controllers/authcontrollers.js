@@ -5,6 +5,13 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY
+const isProduction = process.env.NODE_ENV === 'production'
+const authCookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+}
 
 // protected route middleware
 export const protect = async (req, res, next) => {
@@ -31,22 +38,21 @@ export const protect = async (req, res, next) => {
 
 export const jobsCreate = async (req, res) => {
     const { description, location } = req.body
-    console.log(req.body);
-    
-    if (!description || !location) {
+    const normalizedDescription = description?.trim()
+    const normalizedLocation = location?.trim()
+
+    if (!normalizedDescription || !normalizedLocation) {
         return res.status(400).json({ message: 'Please fill missing details' })
     }
 
     try {
         const job = await Job.create({
-            description,
-            location,
+            description: normalizedDescription,
+            location: normalizedLocation,
 
             // very important line, which creates relation b/w User and their Posts
             createdBy: req.user._id,
         })
-        console.log(job);
-        
         return res.status(201).json({
             description: job.description,
             location: job.location,
@@ -113,10 +119,15 @@ export const getCurrentUser = async (req, res) => {
 }
 
 export const register = async (req, res) => {
-    const {name, email, password} = req.body
+    const name = req.body.name?.trim()
+    const email = req.body.email?.trim().toLowerCase()
+    const { password } = req.body
 
     if(!name || !email || !password){
         return res.status(400).json({ message: `Please provide all required fields` })
+    }
+    if (password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters' })
     }
     const existiging = await User.findOne({email})
 
@@ -135,17 +146,11 @@ export const register = async (req, res) => {
             { expiresIn : '7d' } 
         )
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
+        res.cookie('token', token, authCookieOptions)
 
         return res.json({
             name: user.name,
             email: user.email,
-            token,
         })
     } catch (error) {
         return res.status(500).json({ message: error.message })
@@ -153,7 +158,8 @@ export const register = async (req, res) => {
 }
 
 export const login = async (req, res) => {
-    const {email, password} = req.body
+    const email = req.body.email?.trim().toLowerCase()
+    const { password } = req.body
 
     if(!email || !password){
         return res.status(400).json({ message: 'Invalid credentials' })
@@ -177,16 +183,9 @@ export const login = async (req, res) => {
             { expiresIn : '7d' } 
         )
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            sameSite: 'none',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
+        res.cookie('token', token, authCookieOptions)
 
         return res.status(200).json({
-            token,
             message: "Logged in successsfully!"
         })
 

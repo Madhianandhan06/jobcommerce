@@ -33,7 +33,6 @@ const PostJobs = () => {
           setMyJobs(data.jobs || [])
         }
       } catch (error) {
-        console.log(error)
       }
     }
 
@@ -92,7 +91,7 @@ const PostJobs = () => {
             </div>
 
             <div className='flex gap-2 my-2'>
-              <button className='bg-orange-400 rounded-lg flex-1'>Cancel</button>
+              <button onClick={() => setOpen(false)} className='bg-orange-400 rounded-lg flex-1'>Cancel</button>
               <button onClick={createJobPost} className='bg-blue-400 rounded-lg flex-1'>Post</button>
             </div>
           </div>
