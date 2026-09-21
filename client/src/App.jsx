@@ -7,6 +7,7 @@ import RootLayout from "./layouts/RootLayout"
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom"
 import Authpage from "./pages/Authpage"
 import { useEffect, useState } from "react"
+import API_URL from "./config/api"
 
 // Keep the application pages private until the user has authenticated.
 const ProtectedRoute = ({ children }) => {
@@ -14,7 +15,7 @@ const ProtectedRoute = ({ children }) => {
 
     useEffect(() => {
         // The browser sends the httpOnly cookie automatically with this request.
-        fetch('http://localhost:3000/api/auth/me', {
+        fetch(`${API_URL}/api/auth/me`, {
             credentials: 'include',
             cache: 'no-store',
         })

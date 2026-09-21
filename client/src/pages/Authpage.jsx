@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import API_URL from '../config/api'
 
 const Authpage = () => {
     const navigate = useNavigate()
@@ -13,7 +14,7 @@ const Authpage = () => {
 
     useEffect(() => {
         // The browser sends the httpOnly cookie automatically with this request.
-        fetch('http://localhost:3000/api/auth/me', {
+        fetch(`${API_URL}/api/auth/me`, {
             credentials: 'include',
             cache: 'no-store',
         }).then((res) => {
@@ -38,7 +39,7 @@ const Authpage = () => {
         setError(null)
 
         try {
-            const res = await fetch(`http://localhost:3000/api/auth/${isRegister ? 'register' : 'login'}`, {
+            const res = await fetch(`${API_URL}/api/auth/${isRegister ? 'register' : 'login'}`, {
                 method: 'POST',
                 headers: { 'Content-Type' : 'application/json' },
                 // Allow the browser to store and send the httpOnly auth cookie.

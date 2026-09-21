@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import API_URL from '../config/api'
 
 const PostJobs = () => {
 
@@ -22,7 +23,7 @@ const PostJobs = () => {
   useEffect(() => {
     async function fetchMyJobs() {
       try {
-        const res = await fetch('http://localhost:3000/api/auth/my-jobs', {
+        const res = await fetch(`${API_URL}/api/auth/my-jobs`, {
           method: 'GET',
           credentials: 'include'
         })
@@ -41,7 +42,7 @@ const PostJobs = () => {
 
   async function createJobPost(){
     try {
-      const res = await fetch(`http://localhost:3000/api/auth/post-jobs`, {
+      const res = await fetch(`${API_URL}/api/auth/post-jobs`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include',
@@ -58,7 +59,7 @@ const PostJobs = () => {
       setRequirements('')
       setLocation('anna nagar, wall street, chennai')
 
-      const myJobsResponse = await fetch('http://localhost:3000/api/auth/my-jobs', {
+      const myJobsResponse = await fetch(`${API_URL}/api/auth/my-jobs`, {
         method: 'GET',
         credentials: 'include'
       })

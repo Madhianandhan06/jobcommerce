@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import { useEffect } from 'react'
+import API_URL from '../config/api'
 
 
 function SearchBar({ value, onChange }){
@@ -37,7 +38,7 @@ const SearchJobs = () => {
   useEffect(() => {
     async function searchJobs() {
       try {
-        const res = await fetch(`http://localhost:3000/api/auth/search-jobs`, {
+        const res = await fetch(`${API_URL}/api/auth/search-jobs`, {
           method: 'GET',
           credentials: 'include'
         })

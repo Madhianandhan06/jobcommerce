@@ -9,8 +9,7 @@ const app = express()
 
 await connectDB() // Ensure you call the connectDB function to connect to the database
 app.use(cors({
-  // Allow the Vite URL whether it is opened as localhost or 127.0.0.1.
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: process.env.CLIENT_URL,
   credentials: true,
 }))
 app.use(cookieParser())
@@ -23,6 +22,8 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000')
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
 })
