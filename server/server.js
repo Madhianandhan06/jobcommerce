@@ -6,6 +6,13 @@ import connectDB from './config/db.js'
 import authRouter from './routers/authrouters.js'
 dotenv.config()
 const app = express()
+
+// splits urls, loop through them  & trims white spaces, ignore empty quotes " ", 
+
+// ex: [
+//  "http://localhost:5173",
+//  "https://myapp.vercel.app"
+// ]
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim())
@@ -13,11 +20,14 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
 
 await connectDB() // Ensure you call the connectDB function to connect to the database
 app.use(cors({
+
+  // cors callback function checks whether browser's headers or allowedOrigins array contains credible client request
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true)
     }
 
+    // rejects if url is invalid
     return callback(new Error('Origin is not allowed by CORS'))
   },
   credentials: true,
