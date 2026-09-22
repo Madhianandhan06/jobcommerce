@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import API_URL from '../config/api'
+import api from '../../api/axios'
 
 const PostJobs = () => {
 
@@ -22,18 +22,12 @@ const PostJobs = () => {
 
   useEffect(() => {
     async function fetchMyJobs() {
-      try {
-        const res = await fetch(`${API_URL}/api/auth/my-jobs`, {
-          method: 'GET',
-          credentials: 'include'
-        })
-
-        const data = await res.json()
-        if (res.ok) {
-          setMyJobs(data.jobs || [])
+        try {
+          const response = await api.get('/api/auth/my-jobs')
+          setMyJobs(response.data.jobs || [])
+        } catch (error) {
+          setMyJobs([])
         }
-      } catch (error) {
-      }
     }
 
     fetchMyJobs()
@@ -41,35 +35,20 @@ const PostJobs = () => {
 
   async function createJobPost(){
     try {
-      const res = await fetch(`${API_URL}/api/auth/post-jobs`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify({ description, location })
+      const response = await api.post('/api/auth/post-jobs', {
+        description,
+        location,
       })
 
-      const data = await res.json()
-
-      if(!res.ok){
-        throw new Error(data.message || 'Something went wrong')
-      }
-
-      setToast(data.message)
+      setToast(response.data.message)
       setRequirements('')
       setLocation('anna nagar, wall street, chennai')
 
-      const myJobsResponse = await fetch(`${API_URL}/api/auth/my-jobs`, {
-        method: 'GET',
-        credentials: 'include'
-      })
-
-      const myJobsData = await myJobsResponse.json()
-      if (myJobsResponse.ok) {
-        setMyJobs(myJobsData.jobs || [])
-      }
+      const myJobsResponse = await api.get('/api/auth/my-jobs')
+      setMyJobs(myJobsResponse.data.jobs || [])
   
     } catch (error) {
-      setToast(error.message)
+      setToast(error.response?.data?.message || error.message)
     }
   }
   return (

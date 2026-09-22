@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import { useEffect } from 'react'
-import API_URL from '../config/api'
+import api from '../../api/axios'
 
 
 function SearchBar({ value, onChange }){
@@ -33,16 +33,12 @@ const SearchJobs = () => {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  
   useEffect(() => {
     async function searchJobs() {
       try {
-        const res = await fetch(`${API_URL}/api/auth/search-jobs`, {
-          method: 'GET',
-          credentials: 'include'
-        })
-
-        const data = await res.json()
-        setJobs(data.jobs || [])
+        const res = await api.get(`/api/auth/search-jobs`)
+        setJobs(res.data.jobs || [])
       } catch (error) {
         setJobs([])
       } finally{
