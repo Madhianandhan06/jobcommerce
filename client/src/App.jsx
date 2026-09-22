@@ -7,7 +7,7 @@ import RootLayout from "./layouts/RootLayout"
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom"
 import Authpage from "./pages/Authpage"
 import { useEffect, useState } from "react"
-import API_URL from "./config/api"
+import api from "../api/axios"
 
 // Keep the application pages private until the user has authenticated.
 const ProtectedRoute = ({ children }) => {
@@ -15,12 +15,13 @@ const ProtectedRoute = ({ children }) => {
 
     useEffect(() => {
         // The browser sends the httpOnly cookie automatically with this request.
-        fetch(`${API_URL}/api/auth/me`, {
-            credentials: 'include',
-            cache: 'no-store',
-        })
-            .then((response) => {
-                setAuthState(response.ok ? 'authenticated' : 'unauthenticated')
+        api.get(`/api/auth/me`, {
+            headers: {
+                'Cache-Control': 'no-cache',
+            }
+        // Axios resolves .then() only for successful status codes by default
+        }).then(() => {
+                setAuthState('authenticated')
             })
             .catch(() => {
                 setAuthState('unauthenticated')

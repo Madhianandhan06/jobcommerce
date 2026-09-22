@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import API_URL from '../config/api'
+import api from '../../api/axios'
 
 const Authpage = () => {
     const navigate = useNavigate()
@@ -13,19 +13,15 @@ const Authpage = () => {
     const [password, setPassword] = useState('')
 
     useEffect(() => {
-        // The browser sends the httpOnly cookie automatically with this request.
-        fetch(`${API_URL}/api/auth/me`, {
-            credentials: 'include',
-            cache: 'no-store',
-        }).then((res) => {
-            if(res.ok){
-                navigate('/home', { replace: true })
-                return
-            }
-            // A failed auth check means the login form should be shown.
-            setCheckingAuth(false)
-        }).catch(() => {
-            // A failed request also means the login form should be shown.
+        api.get('/api/auth/me', {
+            headers: {
+                'Cache-Control': 'no-cache',
+            },
+        }).then(() => {
+            navigate('/home', { replace: true })
+        })
+        .catch(() => {
+            // Axios rejects automatically for 401/404/500 responses.
             setCheckingAuth(false)
         })
     }, [navigate])
@@ -39,25 +35,25 @@ const Authpage = () => {
         setError(null)
 
         try {
-            const res = await fetch(`${API_URL}/api/auth/${isRegister ? 'register' : 'login'}`, {
-                method: 'POST',
-                headers: { 'Content-Type' : 'application/json' },
-                // Allow the browser to store and send the httpOnly auth cookie.
-                credentials: 'include',
-                body: JSON.stringify({
+            const response = await api.post(`/api/auth/${isRegister ? 'register' : 'login'}`,
+                {
                     ...(isRegister && { name }),
                     email,
                     password,
-                }),
-            })
+                }
+            )
 
-            const data = await res.json()
-            if (!res.ok || data.message?.toLowerCase().includes('invalid') || data.message?.toLowerCase().includes('not found') || data.message?.toLowerCase().includes('wrong')) {
+            const data = response.data
+
+            if (
+                data.message?.toLowerCase().includes('invalid') ||
+                data.message?.toLowerCase().includes('not found') ||
+                data.message?.toLowerCase().includes('wrong')
+            ) {
                 setError(data.message || 'Authentication failed')
                 return
             }
 
-            // The cookie is set by the server; the route guard verifies it at /home.
             navigate('/home')
         } catch (error) {
             setError(error.message)
