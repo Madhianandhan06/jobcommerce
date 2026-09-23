@@ -15,7 +15,7 @@ const app = express()
 // ]
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean)
 
 await connectDB() // Ensure you call the connectDB function to connect to the database
