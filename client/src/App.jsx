@@ -8,32 +8,19 @@ import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterP
 import Authpage from "./pages/Authpage"
 import { useEffect, useState } from "react"
 import api from "../api/axios"
+import { useAuthStatus } from "./hooks/useAuthStatus"
+
 
 // Keep the application pages private until the user has authenticated.
-const ProtectedRoute = ({ children }) => {
-    const [authState, setAuthState] = useState('checking')
 
-    useEffect(() => {
-        // The browser sends the httpOnly cookie automatically with this request.
-        api.get(`/api/auth/me`, {
-            headers: {
-                'Cache-Control': 'no-cache',
-            }
-        // Axios resolves .then() only for successful status codes by default
-        }).then(() => {
-                setAuthState('authenticated')
-            })
-            .catch(() => {
-                setAuthState('unauthenticated')
-            })
-    }, [])
+function ProtectedRoute({ children }) {
+    const { isChecking, isAuthenticated } = useAuthStatus()
 
-    // Wait for the server response so a valid cookie is not redirected too early.
-    if (authState === 'checking') {
+    if (isChecking) {
         return <p>Checking authentication...</p>
     }
 
-    return authState === 'authenticated'
+    return isAuthenticated
         ? children
         : <Navigate to="/" replace />
 }
