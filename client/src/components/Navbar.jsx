@@ -1,36 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
-import API_URL from '../config/api'
 
-const Navbar = () => {
+const Navbar = ({ profileImage, onProfileImageError }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const modalRef = useRef(null)
-
-  const [uploadedImage, setUploadedImage] = useState(null)
-  console.log(uploadedImage);
-  
-    useEffect(() => {
-        getProfile()
-    }, [])
-
-    async function getProfile() {
-        try {
-            const response = await fetch(`${API_URL}/api/auth/images`, {
-                method: 'GET',
-                credentials: 'include',
-            })
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to fetch')
-            }
-
-            setUploadedImage(data.images)
-        } catch (error) {
-           console.log(error.message);
-           
-        }
-    }
 
   // Close the modal if the user clicks outside of it
   useEffect(() => {
@@ -59,12 +32,12 @@ const Navbar = () => {
             onClick={() => setIsModalOpen(!isModalOpen)}
             className='flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full'
           >
-            {uploadedImage?.[0]?.imageUrl ? (
+            {profileImage?.imageUrl ? (
               <img 
-                src={uploadedImage[0].imageUrl}
+                src={profileImage.imageUrl}
                 alt="profile" 
                 className='h-10 w-10 rounded-full object-cover border border-gray-200' 
-                onError={() => setUploadedImage([])}
+                onError={onProfileImageError}
               />
             ) : (
               /* Fallback default avatar placeholder */
