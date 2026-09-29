@@ -3,7 +3,12 @@ import Job from '../models/jobModel.js'
 import User from '../models/userModel.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import multer from 'multer'
+import Image from '../models/ImageModel.js'
+import cloudinary from '../services/cloudinary.js'
 
+const upload = multer({ dest: "uploads/" });
+export const uploadProfileImage = upload.single('image')
 const JWT_SECRET = process.env.JWT_SECRET_KEY
 const isProduction = process.env.NODE_ENV === 'production'
 const authCookieOptions = {
@@ -80,7 +85,25 @@ export const searchJobs = async (req, res) => {
             return res.status(404).json({ message: 'No jobs found' })
         }
 
-        return res.status(200).json({ jobs })
+        const creatorIds = [...new Set(jobs.map((job) => job.createdBy.toString()))]
+        const images = await Image.find({ createdBy: { $in: creatorIds } })
+            .sort({ createdAt: -1 })
+            .select('createdBy imageUrl')
+        const profileImageByCreator = new Map()
+
+        for (const image of images) {
+            const creatorId = image.createdBy.toString()
+            if (!profileImageByCreator.has(creatorId)) {
+                profileImageByCreator.set(creatorId, image.imageUrl)
+            }
+        }
+
+        const jobsWithProfiles = jobs.map((job) => ({
+            ...job.toObject(),
+            profileImageUrl: profileImageByCreator.get(job.createdBy.toString()) || null,
+        }))
+
+        return res.status(200).json({ jobs: jobsWithProfiles })
     } catch (error) {
         return res.status(500).json({ message: error.message })
     }
@@ -192,4 +215,38 @@ export const login = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message })
     }
+}
+
+export const getMyProfile = async (req, res) => {
+    try {
+        const images = await Image.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
+        return res.json({ images });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+export const postMyProfile = async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: "Select an image to upload." });
+    }
+
+  try {
+    const result = await cloudinary.uploader.upload(req.file.path);
+    console.log(result);
+    
+    const image = await Image.create({
+      imageUrl: result.secure_url,
+      publicId: result.public_id,
+      createdBy: req.user._id,
+    });
+
+    res.json({
+      image,
+      message: "File received",
+    });
+  } catch (error) {
+        return res.status(500).json({ message: error.message });
+  }
+
 }

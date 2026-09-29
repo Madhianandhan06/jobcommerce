@@ -2,13 +2,15 @@ import Home from "./pages/Home"
 import Contact from "./pages/Contact"
 import SearchJobs from "./pages/SearchJobs"
 import PostJobs from "./pages/PostJobs"
-import Earnings from "./pages/Earnings"
+import Earnings from "./pages/Profile"
 import RootLayout from "./layouts/RootLayout"
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom"
 import Authpage from "./pages/Authpage"
 import { useEffect, useState } from "react"
 import api from "../api/axios"
 import { useAuthStatus } from "./hooks/useAuthStatus"
+import Profile from "./pages/Profile"
+import EditProfile from "./pages/EditProfile"
 
 
 // Keep the application pages private until the user has authenticated.
@@ -35,7 +37,8 @@ function App() {
                     <Route path="search-jobs" element={<SearchJobs />} />
                     <Route path="post-jobs" element={<PostJobs />} />
                     <Route path="contact" element={<Contact />} />
-                    <Route path="earnings" element={<Earnings />} />
+                    <Route path="earnings" element={<Profile/>} />
+                    <Route path="edit-profile" element={<EditProfile/>}/>
                 </Route>
             </>
         )
