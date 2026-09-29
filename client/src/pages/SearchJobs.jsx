@@ -13,14 +13,40 @@ function SearchBar({ value, onChange }){
   )
 }
 
+function JobPosterAvatar({ imageUrl }) {
+  const [imageFailed, setImageFailed] = useState(false)
+
+  if (!imageUrl || imageFailed) {
+    return (
+      <div className='h-10 w-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold border border-gray-200 shadow-sm'>
+        U
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={imageUrl}
+      alt="Job poster profile"
+      className='h-10 w-10 rounded-full object-cover border border-gray-200'
+      onError={() => setImageFailed(true)}
+    />
+  )
+}
+
 function FilteredJobs({ filteredJobs, formatRelativeTime }){
   return(
     <div>
           {filteredJobs.map(job => (
             <div key={job._id} className='bg-red-600 text-white my-2 p-2 rounded-lg'>
-              <h2>{job.description}</h2>
-              <p className='text-xs'>{job.location}</p>
-              <p>{formatRelativeTime(job.createdAt)}</p>
+              <div className='flex items-center gap-3'>
+                <JobPosterAvatar imageUrl={job.profileImageUrl} />
+                <div>
+                  <h2>{job.description}</h2>
+                  <p className='text-xs'>{job.location}</p>
+                  <p>{formatRelativeTime(job.createdAt)}</p>
+                </div>
+              </div>
             </div>
           ))}
     </div>
@@ -33,7 +59,8 @@ const SearchJobs = () => {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  
+
+
   useEffect(() => {
     async function searchJobs() {
       try {
