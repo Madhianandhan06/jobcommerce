@@ -80,13 +80,15 @@ export const searchJobs = async (req, res) => {
         }
 
         const jobs = await Job.find(filter).sort({ createdAt: -1 })
-
         if (jobs.length === 0) {
             return res.status(404).json({ message: 'No jobs found' })
         }
 
         const creatorIds = [...new Set(jobs.map((job) => job.createdBy.toString()))]
-        console.log(creatorIds);
+        const users = await User.find({ _id: { $in: creatorIds } }).select('_id name')
+        const creatorNames = new Map(
+            users.map((user) => [user._id.toString(), user.name])
+        )
         
         const images = await Image.find({ createdBy: { $in: creatorIds } })
             .sort({ createdAt: -1 })
@@ -104,6 +106,7 @@ export const searchJobs = async (req, res) => {
 
         const jobsWithProfiles = jobs.map((job) => ({
             ...job.toObject(),
+            creatorName: creatorNames.get(job.createdBy.toString()) || null,
             profileImageUrl: profileImageByCreator.get(job.createdBy.toString()) || null,
         }))
 

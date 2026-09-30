@@ -36,11 +36,14 @@ function JobPosterAvatar({ imageUrl }) {
 
 function FilteredJobs({ filteredJobs, formatRelativeTime }){
   return(
-    <div>
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           {filteredJobs.map(job => (
-            <div key={job._id} className='bg-red-600 text-white my-2 p-2 rounded-lg'>
-              <div className='flex items-center gap-3'>
-                <JobPosterAvatar imageUrl={job.profileImageUrl} />
+            <div key={job._id} className='min-h-40 rounded-lg bg-red-600 p-4 text-white'>
+              <div className='flex flex-col gap-3'>
+                  <div className='flex items-center gap-2'>
+                    <JobPosterAvatar imageUrl={job.profileImageUrl} />
+                    <span>{job.creatorName}</span>
+                  </div>
                 <div>
                   <h2>{job.description}</h2>
                   <p className='text-xs'>{job.location}</p>
@@ -57,8 +60,6 @@ function FilteredJobs({ filteredJobs, formatRelativeTime }){
 const SearchJobs = () => {
 
   const [jobs, setJobs] = useState([])
-  console.log(jobs);
-  
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
@@ -68,8 +69,6 @@ const SearchJobs = () => {
       try {
         const res = await api.get(`/api/auth/search-jobs`)
         setJobs(res.data.jobs || [])
-        console.log(jobs);
-        
       } catch (error) {
         setJobs([])
       } finally{
@@ -116,7 +115,7 @@ const filteredJobs = jobs.filter(job => (
 ))
 
   return (
-    <div>
+    <div className='mx-auto w-full max-w-6xl px-4'>
           <div>
             {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>) 
               : <div>

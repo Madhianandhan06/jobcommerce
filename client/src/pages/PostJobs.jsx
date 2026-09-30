@@ -52,13 +52,13 @@ const PostJobs = () => {
     }
   }
   return (
-    <div className='flex flex-col items-center '>
+    <div className='mx-auto flex w-full max-w-6xl flex-col items-center px-4'>
       {toast && <span>{toast}</span>}
       <button onClick={() => setOpen(p => !p)} className='bg-green-600 p-2 rounded-lg'>
         +Create Job</button>
 
         {open && (
-          <div className='flex flex-col w-full m-4 p-4 rounded-lg border-2 border-900-blue space-y-2'>
+          <div className='mt-4 flex w-full max-w-2xl flex-col space-y-2 rounded-lg border-2 border-900-blue p-4'>
             <div  className='flex flex-col'>
               <label htmlFor="">Job description*</label>
               <input className='p-1.5 rounded-lg' type="text" value={description} onChange={(e) => setRequirements(e.target.value)} />
@@ -76,17 +76,19 @@ const PostJobs = () => {
           </div>
         )}
 
-        <div className='w-full mt-6'>
-          <h3 className='font-bold mb-2'>Your jobs</h3>
+        <div className='mt-6 w-full'>
+          <h3 className='mb-4 font-bold'>Your jobs</h3>
           {!myJobs || myJobs.length === 0 ? (
             <p>No jobs posted yet.</p>
           ) : (
-            myJobs.map((job) => (
-              <div key={job._id} className='bg-orange-600 my-2 p-2 rounded-lg'>
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+              {myJobs.map((job) => (
+              <div key={job._id} className='min-h-28 rounded-lg bg-orange-600 p-4'>
                 <h2>{job.description}</h2>
                 <p className='text-xs'>{job.location}</p>
               </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
     </div>
