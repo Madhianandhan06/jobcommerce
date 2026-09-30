@@ -69,6 +69,22 @@ const Navbar = ({ profileImage, onProfileImageError }) => {
               >
                 Edit Profile
               </NavLink>
+
+              <NavLink 
+                to='/home/edit-profile' 
+                onClick={() => setIsModalOpen(false)}
+                className='block px-4 py-2 text-sm text-blue-700 hover:bg-gray-50 transition-colors'
+              >
+                Log out
+              </NavLink>
+
+              <NavLink 
+                to='/home/edit-profile' 
+                onClick={() => setIsModalOpen(false)}
+                className='block px-4 py-2 text-sm text-red-700 hover:bg-gray-50 transition-colors'
+              >
+                Delete account
+              </NavLink>
             </div>
           )}
         </li>

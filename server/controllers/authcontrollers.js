@@ -86,9 +86,13 @@ export const searchJobs = async (req, res) => {
         }
 
         const creatorIds = [...new Set(jobs.map((job) => job.createdBy.toString()))]
+        console.log(creatorIds);
+        
         const images = await Image.find({ createdBy: { $in: creatorIds } })
             .sort({ createdAt: -1 })
             .select('createdBy imageUrl')
+        console.log(images);
+        
         const profileImageByCreator = new Map()
 
         for (const image of images) {

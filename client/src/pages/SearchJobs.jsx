@@ -57,6 +57,8 @@ function FilteredJobs({ filteredJobs, formatRelativeTime }){
 const SearchJobs = () => {
 
   const [jobs, setJobs] = useState([])
+  console.log(jobs);
+  
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
@@ -66,6 +68,8 @@ const SearchJobs = () => {
       try {
         const res = await api.get(`/api/auth/search-jobs`)
         setJobs(res.data.jobs || [])
+        console.log(jobs);
+        
       } catch (error) {
         setJobs([])
       } finally{
