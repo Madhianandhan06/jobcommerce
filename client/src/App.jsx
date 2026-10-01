@@ -11,6 +11,7 @@ import api from "../api/axios"
 import { useAuthStatus } from "./hooks/useAuthStatus"
 import Profile from "./pages/Profile"
 import EditProfile from "./pages/EditProfile"
+import NotFound from "./pages/NotFound"
 
 
 // Keep the application pages private until the user has authenticated.
@@ -39,7 +40,9 @@ function App() {
                     <Route path="contact" element={<Contact />} />
                     <Route path="earnings" element={<Profile/>} />
                     <Route path="edit-profile" element={<EditProfile/>}/>
+                    <Route path="*" element={<NotFound />} />
                 </Route>
+                <Route path="*" element={<NotFound />} />
             </>
         )
     )
