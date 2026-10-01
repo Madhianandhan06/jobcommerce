@@ -1,1 +1,1 @@
-live site link: https://jobcommerce.vercel.app/home/search-jobs
+live site link: https://jobcommerce.vercel.app
