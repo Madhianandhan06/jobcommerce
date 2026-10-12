@@ -1,13 +1,14 @@
-import React from 'react'
 import { useState } from 'react'
 import API_URL from '../config/api'
 import { useOutletContext } from 'react-router-dom'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 const EditProfile = () => {
     const { setProfileImage } = useOutletContext()
 
     const [image, setImage] = useState(null)
     const [uploadError, setUploadError] = useState('')
+    const [isUploading, setIsUploading] = useState(false)
 
     async function uploadProfile() {
         if (!image) return
@@ -15,6 +16,7 @@ const EditProfile = () => {
         const formData = new FormData()
         formData.append('image', image)
 
+        setIsUploading(true)
         try {
             const response = await fetch(`${API_URL}/api/auth/upload`, {
                 method: 'POST',
@@ -32,10 +34,13 @@ const EditProfile = () => {
             setUploadError('')
         } catch (error) {
             setUploadError(error.message || 'Image upload failed')
+        } finally {
+            setIsUploading(false)
         }
     }
   return (
     <div>
+      <LoadingOverlay isLoading={isUploading} label='Uploading profile image...'>
         <h2>Edit Profile</h2>
 
         <div>
@@ -49,8 +54,9 @@ const EditProfile = () => {
             />
         </div>
 
-        {image && <button className='bg-red-600 p-2 rounded-lg' onClick={uploadProfile}>Upload Profile</button>}
+        {image && <button className='bg-red-600 p-2 rounded-lg disabled:cursor-not-allowed' disabled={isUploading} onClick={uploadProfile}>Upload Profile</button>}
         {uploadError && <p role="alert">{uploadError}</p>}
+      </LoadingOverlay>
     </div>
   )
 }

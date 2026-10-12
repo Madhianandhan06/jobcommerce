@@ -2,16 +2,14 @@ import Home from "./pages/Home"
 import Contact from "./pages/Contact"
 import SearchJobs from "./pages/SearchJobs"
 import PostJobs from "./pages/PostJobs"
-import Earnings from "./pages/Profile"
 import RootLayout from "./layouts/RootLayout"
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom"
 import Authpage from "./pages/Authpage"
-import { useEffect, useState } from "react"
-import api from "../api/axios"
 import { useAuthStatus } from "./hooks/useAuthStatus"
 import Profile from "./pages/Profile"
 import EditProfile from "./pages/EditProfile"
 import NotFound from "./pages/NotFound"
+import LoadingOverlay from "./components/LoadingOverlay"
 
 
 // Keep the application pages private until the user has authenticated.
@@ -20,7 +18,7 @@ function ProtectedRoute({ children }) {
     const { isChecking, isAuthenticated } = useAuthStatus()
 
     if (isChecking) {
-        return <p>Checking authentication...</p>
+        return <LoadingOverlay isLoading label="Checking authentication..." className="min-h-screen bg-slate-100" />
     }
 
     return isAuthenticated

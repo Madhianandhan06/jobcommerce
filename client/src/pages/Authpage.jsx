@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../../api/axios'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 const Authpage = () => {
     const navigate = useNavigate()
     const [isRegister, setIsRegister] = useState(false)
     const [error, setError] = useState(null)
     const [checkingAuth, setCheckingAuth] = useState(true)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -27,12 +29,13 @@ const Authpage = () => {
     }, [navigate])
 
     if (checkingAuth) {
-        return <p>Checking authentication...</p>
+        return <LoadingOverlay isLoading label="Checking authentication..." className="min-h-screen bg-gray-100" />
     }
 
     async function submitAuth(event) {
         event.preventDefault()
         setError(null)
+        setIsSubmitting(true)
 
         try {
             const response = await api.post(`/api/auth/${isRegister ? 'register' : 'login'}`,
@@ -57,12 +60,15 @@ const Authpage = () => {
             navigate('/home')
         } catch (error) {
             setError(error.message)
+        } finally {
+            setIsSubmitting(false)
         }
     }
   return (
     <div className='flex flex-col justify-center items-center h-screen bg-gray-100'>
-        {error}
-        <div className='flex flex-col m-auto bg-slate-200 rounded-lg shadow-lg w-96'>
+        {error && <p role="alert">{error}</p>}
+        <LoadingOverlay isLoading={isSubmitting} label={isRegister ? 'Creating your account...' : 'Signing in...'} className='my-auto w-96'>
+        <div className='flex flex-col bg-slate-200 rounded-lg shadow-lg w-96'>
             <div className='flex flex-col p-4 space-y-2'>
                 <h2 className='self-center'>Welcome to JobCommerce</h2>
                 <p className='text-xs self-center'>{isRegister ? 'Create an account' : 'Sign in to continue'}</p>
@@ -96,6 +102,7 @@ const Authpage = () => {
                 </div>
             </div>
         </div>
+        </LoadingOverlay>
     </div>
   )
 }

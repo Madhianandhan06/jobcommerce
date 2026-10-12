@@ -1,7 +1,7 @@
-import React from 'react'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import api from '../../api/axios'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 
 function SearchBar({ value, onChange }){
@@ -69,7 +69,7 @@ const SearchJobs = () => {
       try {
         const res = await api.get(`/api/auth/search-jobs`)
         setJobs(res.data.jobs || [])
-      } catch (error) {
+      } catch {
         setJobs([])
       } finally{
         setLoading(false)
@@ -78,16 +78,13 @@ const SearchJobs = () => {
     searchJobs()
   },[])
 
-  if(loading){
-    return <p>Loading Jobs</p>
-  }
 const formatRelativeTime = (dateString) => {
   const createdDate = new Date(dateString);
   const now = new Date();
-  
+
   // Calculate difference in milliseconds
   const diffMs = now - createdDate;
-  
+
   // Convert milliseconds to minutes, hours, and days
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -99,11 +96,11 @@ const formatRelativeTime = (dateString) => {
   if (diffMinutes < 60) {
     if (diffMinutes <= 0) return "Just now";
     return rtf.format(-diffMinutes, 'minute');
-  } 
+  }
   // 2. Under 24 hours -> Show hours
   else if (diffHours < 24) {
     return rtf.format(-diffHours, 'hour');
-  } 
+  }
   // 3. Over 24 hours -> Show days
   else {
     return rtf.format(-diffDays, 'day');
@@ -116,14 +113,16 @@ const filteredJobs = jobs.filter(job => (
 
   return (
     <div className='mx-auto w-full max-w-6xl px-4'>
-          <div>
-            {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>) 
-              : <div>
-                <SearchBar value={search} onChange={(e) => setSearch(e.target.value)}/>
-                <FilteredJobs filteredJobs={filteredJobs} formatRelativeTime={formatRelativeTime}/>
-              </div>
-            }
+      <LoadingOverlay isLoading={loading} label='Loading jobs...' className='min-h-[50vh]'>
+        <div>
+          {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>)
+            : <div>
+              <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
+              <FilteredJobs filteredJobs={filteredJobs} formatRelativeTime={formatRelativeTime} />
+            </div>
+          }
         </div>
+      </LoadingOverlay>
     </div>
   )
 }
