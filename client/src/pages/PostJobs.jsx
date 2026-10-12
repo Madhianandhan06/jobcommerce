@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from '../../api/axios'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 const PostJobs = () => {
 
@@ -7,6 +8,8 @@ const PostJobs = () => {
   const [description, setRequirements] = useState('')
   const [location, setLocation] = useState('anna nagar, wall street, chennai')
   const [myJobs, setMyJobs] = useState([])
+  const [loadingJobs, setLoadingJobs] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [toast, setToast] = useState(null)
 
@@ -25,8 +28,10 @@ const PostJobs = () => {
         try {
           const response = await api.get('/api/auth/my-jobs')
           setMyJobs(response.data.jobs || [])
-        } catch (error) {
+        } catch {
           setMyJobs([])
+        } finally {
+          setLoadingJobs(false)
         }
     }
 
@@ -34,6 +39,7 @@ const PostJobs = () => {
   }, [])
 
   async function createJobPost(){
+    setIsSubmitting(true)
     try {
       const response = await api.post('/api/auth/post-jobs', {
         description,
@@ -44,11 +50,15 @@ const PostJobs = () => {
       setRequirements('')
       setLocation('anna nagar, wall street, chennai')
 
+      setLoadingJobs(true)
       const myJobsResponse = await api.get('/api/auth/my-jobs')
       setMyJobs(myJobsResponse.data.jobs || [])
   
     } catch (error) {
       setToast(error.response?.data?.message || error.message)
+    } finally {
+      setIsSubmitting(false)
+      setLoadingJobs(false)
     }
   }
   return (
@@ -58,7 +68,8 @@ const PostJobs = () => {
         +Create Job</button>
 
         {open && (
-          <div className='mt-4 flex w-full max-w-2xl flex-col space-y-2 rounded-lg border-2 border-900-blue p-4'>
+          <LoadingOverlay isLoading={isSubmitting} label='Posting job...' className='mt-4 w-full max-w-2xl'>
+          <div className='flex w-full flex-col space-y-2 rounded-lg border-2 border-900-blue p-4'>
             <div  className='flex flex-col'>
               <label htmlFor="">Job description*</label>
               <input className='p-1.5 rounded-lg' type="text" value={description} onChange={(e) => setRequirements(e.target.value)} />
@@ -71,25 +82,28 @@ const PostJobs = () => {
 
             <div className='flex gap-2 my-2'>
               <button onClick={() => setOpen(false)} className='bg-orange-400 rounded-lg flex-1'>Cancel</button>
-              <button onClick={createJobPost} className='bg-blue-400 rounded-lg flex-1'>Post</button>
+              <button onClick={createJobPost} disabled={isSubmitting} className='bg-blue-400 rounded-lg flex-1 disabled:cursor-not-allowed'>Post</button>
             </div>
           </div>
+          </LoadingOverlay>
         )}
 
         <div className='mt-6 w-full'>
           <h3 className='mb-4 font-bold'>Your jobs</h3>
-          {!myJobs || myJobs.length === 0 ? (
-            <p>No jobs posted yet.</p>
-          ) : (
-            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-              {myJobs.map((job) => (
-              <div key={job._id} className='min-h-28 rounded-lg bg-orange-600 p-4'>
-                <h2>{job.description}</h2>
-                <p className='text-xs'>{job.location}</p>
+          <LoadingOverlay isLoading={loadingJobs} label='Loading your jobs...' className='min-h-24'>
+            {!myJobs || myJobs.length === 0 ? (
+              <p>No jobs posted yet.</p>
+            ) : (
+              <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+                {myJobs.map((job) => (
+                <div key={job._id} className='min-h-28 rounded-lg bg-orange-600 p-4'>
+                  <h2>{job.description}</h2>
+                  <p className='text-xs'>{job.location}</p>
+                </div>
+                ))}
               </div>
-              ))}
-            </div>
-          )}
+            )}
+          </LoadingOverlay>
         </div>
     </div>
   )

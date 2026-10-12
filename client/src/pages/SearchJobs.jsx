@@ -1,7 +1,7 @@
-import React from 'react'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import api from '../../api/axios'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 
 function SearchBar({ value, onChange }){
@@ -69,7 +69,7 @@ const SearchJobs = () => {
       try {
         const res = await api.get(`/api/auth/search-jobs`)
         setJobs(res.data.jobs || [])
-      } catch (error) {
+      } catch {
         setJobs([])
       } finally{
         setLoading(false)
@@ -78,9 +78,6 @@ const SearchJobs = () => {
     searchJobs()
   },[])
 
-  if(loading){
-    return <p>Loading Jobs</p>
-  }
 const formatRelativeTime = (dateString) => {
   const createdDate = new Date(dateString);
   const now = new Date();
@@ -116,14 +113,16 @@ const filteredJobs = jobs.filter(job => (
 
   return (
     <div className='mx-auto w-full max-w-6xl px-4'>
-          <div>
-            {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>) 
-              : <div>
-                <SearchBar value={search} onChange={(e) => setSearch(e.target.value)}/>
-                <FilteredJobs filteredJobs={filteredJobs} formatRelativeTime={formatRelativeTime}/>
-              </div>
-            }
+      <LoadingOverlay isLoading={loading} label='Loading jobs...' className='min-h-[50vh]'>
+        <div>
+          {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>)
+            : <div>
+              <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
+              <FilteredJobs filteredJobs={filteredJobs} formatRelativeTime={formatRelativeTime} />
+            </div>
+          }
         </div>
+      </LoadingOverlay>
     </div>
   )
 }
