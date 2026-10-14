@@ -4,11 +4,20 @@ import api from '../../api/axios'
 import LoadingOverlay from '../components/LoadingOverlay'
 
 
-function SearchBar({ value, onChange }){
+function SearchBar({ value, onChange, onClear }){
   return(
     <div className='flex gap-2 p-2 justify-center items-center'>
       <label htmlFor="">Search your Jobs</label>
       <input className='px-2 py-1.5  shadow-lg rounded-lg ' type="text" placeholder='search by job...' value={value} onChange={onChange}/>
+      {value && (
+        <button
+          type="button"
+          className='rounded-lg bg-gray-200 px-3 py-1.5 text-gray-800 hover:bg-gray-300'
+          onClick={onClear}
+        >
+          Clear search
+        </button>
+      )}
     </div>
   )
 }
@@ -117,7 +126,7 @@ const filteredJobs = jobs.filter(job => (
         <div>
           {!jobs || jobs.length === 0 ? (<p>No jobs has been listed</p>)
             : <div>
-              <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} />
+              <SearchBar value={search} onChange={(e) => setSearch(e.target.value)} onClear={() => setSearch('')} />
               <FilteredJobs filteredJobs={filteredJobs} formatRelativeTime={formatRelativeTime} />
             </div>
           }
