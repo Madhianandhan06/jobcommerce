@@ -8,7 +8,7 @@ function SearchBar({ value, onChange, onClear }){
   return(
     <div className='flex gap-2 p-2 justify-center items-center'>
       <label htmlFor="">Search your Jobs</label>
-      <input className='px-2 py-1.5  shadow-lg rounded-lg ' type="text" placeholder='search by job...' value={value} onChange={onChange}/>
+      <input className='px-2 py-1.5 shadow-lg rounded-lg' type="text" placeholder='search by job or location...' value={value} onChange={onChange}/>
       {value && (
         <button
           type="button"
@@ -117,7 +117,7 @@ const formatRelativeTime = (dateString) => {
 };
 
 const filteredJobs = jobs.filter(job => (
-  job.description.toLowerCase().includes(search.toLowerCase())
+  `${job.description || ''} ${job.location || ''}`.toLowerCase().includes(search.toLowerCase())
 ))
 
   return (
